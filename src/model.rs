@@ -56,14 +56,52 @@ fn add_doctor(doctor: Doctor) {
     db.add_item(doctor.clone()).unwrap();
 }
 
-fn query_doctor(doctor_name: String) -> Doctor {
+fn query_doctor(doctor_id: u32) -> Doctor {
     let db_path = PathBuf::from("calendar_doctors.tinydb");
     let db: Database<Doctor> = Database::auto_from(db_path, false).unwrap();
 
     let default = Doctor{id: 0, name: String::from("NONE"), upin: String::from("NONE"), specialty: Specialty::Endocrinologist, hourly_rate: 0};
 
-    let result_doctor = db.query_item(|x: &Doctor| &x.name, doctor_name).unwrap_or(&default);
+    let result_doctor = db.query_item(|x: &Doctor| &x.id, doctor_id).unwrap_or(&default);
 
 
     return result_doctor.clone()
+}
+
+fn add_appointment(appointment: Appointment) {
+    let db_path = PathBuf::from("calendar_appointments.tinydb");
+    let mut db: Database<Appointment> = Database::auto_from(db_path, false).unwrap();
+
+    db.add_item(appointment.clone()).unwrap();
+}
+
+fn query_appontment(appointment_id: u32) -> Appointment {
+    let db_path = PathBuf::from("calendar_appointments.tinydb");
+    let db: Database<Appointment> = Database::auto_from(db_path, false).unwrap();
+
+    let default = Appointment{id: 0, doctor_id: 0, triage: Triage::CheckUp, appointment_time_unix: 0};
+
+    let result_appointment = db.query_item(|x: &Appointment| &x.id, appointment_id).unwrap_or(&default);
+
+
+    return result_appointment.clone()
+}
+
+fn add_doctor_appointment(doctor_appointment: DoctorAppointment) {
+    let db_path = PathBuf::from("calendar_doctor_appointments.tinydb");
+    let mut db: Database<DoctorAppointment> = Database::auto_from(db_path, false).unwrap();
+
+    db.add_item(doctor_appointment.clone()).unwrap();
+}
+
+fn query_doctor_appontment(doctor_appointment_id: u32) -> DoctorAppointment {
+    let db_path = PathBuf::from("calendar_doctor_appointments.tinydb");
+    let db: Database<DoctorAppointment> = Database::auto_from(db_path, false).unwrap();
+
+    let default = DoctorAppointment{id: 0, appointment_id: 0, doctor_id: 0, day_date: String::from("NONE")};
+
+    let result_doctor_appointment = db.query_item(|x: &DoctorAppointment| &x.id, doctor_appointment_id).unwrap_or(&default);
+
+
+    return result_doctor_appointment.clone()
 }
