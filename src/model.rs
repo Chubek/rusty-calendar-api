@@ -3,7 +3,7 @@ use tinydb::Database;
 use std::path::PathBuf;
 
 #[derive(Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Clone)]
-enum Specialty {
+pub enum Specialty {
     Pediatrician,
     Endocrinologist,
     ThroatEarNose,
@@ -22,7 +22,7 @@ pub struct Doctor {
 }
  
 #[derive(Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Clone)]
-enum Triage {
+pub enum Triage {
     Urgent,
     SimpleVisit,
     CheckUp,

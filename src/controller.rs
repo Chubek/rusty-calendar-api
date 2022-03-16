@@ -82,5 +82,60 @@ fn insert_doctor_appointment(doctor_id_str: String, appointment_id_str: String, 
 
 }
 
+fn get_doctor_appointment(doctor_id_str: String, appointment_id_str: String, day: String) -> String {
+    let hash_id = hash_str(format!("{}{}{}", doctor_id_str, appointment_id_str, day));
 
+    let doctorapp = query_doctor_appontment(hash_id);
 
+    let doctorapp_json = json!(doctorapp);
+
+    return doctorapp_json.to_string();
+}
+
+pub fn main_handler(body: String, url: &str, method: &str) -> String {
+    let url_path = get_url_path(url);
+
+    return match url_path {
+        String::from("doctor") => {
+            if method == "POST" {
+                let id = marshal_add_doctor_body(body);
+                id.to_string()
+            } else {
+                let queries = get_queries(url);
+                let sel = select_query(queries, "id");
+
+                query_stringify_doctor(sel)
+            }
+        },
+        String::from("appointment") => {
+            if method == "POST" {
+                let id = marshal_add_appointment_body(body);
+                id.to_string()
+            } else if method == "GET" {
+                let queries = get_queries(url);
+                let sel = select_query(queries, "id");
+
+                query_stringify_appointment(sel)
+            } else {
+                let queries = get_queries(url);
+                let sel = select_query(queries, "id");
+
+                query_delete_appointment(sel)
+            }
+        },
+        String::from("doctorappointment") => {
+            let queries = get_queries(url);
+            let sel_doctor_id = select_query(queries.clone(), "doctor_id");
+            let sel_appointment_id = select_query(queries.clone(), "appointment_id");
+            let sel_day = select_query(queries, "doctor_day");
+
+            return if method == "POST" {
+                insert_doctor_appointment(sel_doctor_id, sel_appointment_id, sel_day);
+
+                String::from("Success!")
+            } else {
+                get_doctor_appointment(sel_doctor_id, sel_appointment_id, sel_day)
+            }
+        }
+    }
+}
