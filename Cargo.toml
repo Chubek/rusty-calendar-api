@@ -7,3 +7,7 @@ edition = "2021"
 
 [dependencies]
 tiny_http = "0.11"
+tinydb = "1"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+chrono = "0.4"
