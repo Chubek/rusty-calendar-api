@@ -14,11 +14,11 @@ enum Specialty {
 
 #[derive(Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Clone)]
 pub struct Doctor {
-    id: u32,
-    name: String,
-    specialty: Specialty,
-    upin: String,
-    hourly_rate: u64
+    pub id: u64,
+    pub name: String,
+    pub specialty: Specialty,
+    pub upin: String,
+    pub hourly_rate: u64
 }
  
 #[derive(Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Clone)]
@@ -33,19 +33,19 @@ enum Triage {
 
 #[derive(Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Clone)]
 pub struct Appointment {
-    id: u32,
-    doctor_id: u32,
-    triage: Triage,
-    appointment_time_unix: i64
+    pub id: u64,
+    pub doctor_id: u32,
+    pub triage: Triage,
+    pub appointment_time: String
 }
  
 
 #[derive(Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Clone)]
 pub struct DoctorAppointment {
-    id: u32,
-    day_date: String,
-    doctor_id: u32,
-    appointment_id: u32
+    pub id: u64,
+    pub day_date: String,
+    pub doctor_id: u32,
+    pub appointment_id: u32
 }
  
 
@@ -56,7 +56,7 @@ pub fn add_doctor(doctor: Doctor) {
     db.add_item(doctor.clone()).unwrap();
 }
 
-pub fn query_doctor(doctor_id: u32) -> Doctor {
+pub fn query_doctor(doctor_id: u64) -> Doctor {
     let db_path = PathBuf::from("calendar_doctors.tinydb");
     let db: Database<Doctor> = Database::auto_from(db_path, false).unwrap();
 
@@ -75,17 +75,33 @@ pub fn add_appointment(appointment: Appointment) {
     db.add_item(appointment.clone()).unwrap();
 }
 
-pub fn query_appointment(appointment_id: u32) -> Appointment {
+pub fn query_appointment(appointment_id: u64) -> Appointment {
     let db_path = PathBuf::from("calendar_appointments.tinydb");
     let db: Database<Appointment> = Database::auto_from(db_path, false).unwrap();
 
-    let default = Appointment{id: 0, doctor_id: 0, triage: Triage::CheckUp, appointment_time_unix: 0};
+    let default = Appointment{id: 0, doctor_id: 0, triage: Triage::CheckUp, appointment_time: String::new()};
 
     let result_appointment = db.query_item(|x: &Appointment| &x.id, appointment_id).unwrap_or(&default);
 
 
     return result_appointment.clone()
 }
+
+pub fn delete_appointment(appointment_id: u64) -> u8 {
+    let db_path = PathBuf::from("calendar_appointments.tinydb");
+    let  db: Database<Appointment> = Database::auto_from(db_path, false).unwrap();
+
+    let default = Appointment{id: 0, doctor_id: 0, triage: Triage::CheckUp, appointment_time: String::new()};
+
+    let result_appointment = db.query_item(|x: &Appointment| &x.id, appointment_id).unwrap_or(&default);
+
+    match db.clone().remove_item(result_appointment) {
+        Ok(_) =>  100,
+        _ => 101
+    }
+    
+}
+
 
 pub fn add_doctor_appointment(doctor_appointment: DoctorAppointment) {
     let db_path = PathBuf::from("calendar_doctor_appointments.tinydb");
@@ -94,7 +110,7 @@ pub fn add_doctor_appointment(doctor_appointment: DoctorAppointment) {
     db.add_item(doctor_appointment.clone()).unwrap();
 }
 
-pub fn query_doctor_appontment(doctor_appointment_id: u32) -> DoctorAppointment {
+pub fn query_doctor_appontment(doctor_appointment_id: u64) -> DoctorAppointment {
     let db_path = PathBuf::from("calendar_doctor_appointments.tinydb");
     let db: Database<DoctorAppointment> = Database::auto_from(db_path, false).unwrap();
 
