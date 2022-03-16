@@ -1,5 +1,6 @@
 mod utils;
 mod model;
+mod controller;
 
 use tiny_http::{Server, Response};
 
